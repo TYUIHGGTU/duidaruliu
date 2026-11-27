@@ -43,10 +43,16 @@ import {
   selectCombinedModels,
   selectSelectedModelKey,
 } from '../../../models/selection';
+import {
+  hasModelSetupIssue,
+  hasNoSelectableModels,
+  selectModelReadiness,
+} from '../../../models/readiness';
 
 import { articleCommands, findQuickCommand, toSuggestionOptions } from '../../../utils/quickCommand';
 
 import ModelPicker from './ModelPicker';
+import ModelStatusCard from './ModelStatusCard';
 import ToolApprovalCard from './ToolApproval';
 import PageRefCard, { type PageChip } from './PageRefCard';
 
@@ -63,6 +69,7 @@ const ChatSender: FC = () => {
   const modelsStatus = useAppSelector((state) => state.ollama.modelsStatus);
   // 选中自定义模型时不依赖本机 Ollama，能力来自模型自己的声明。
   const backendReady = useAppSelector(selectBackendReady);
+  const readiness = useAppSelector(selectModelReadiness);
   const allModels = useAppSelector(selectCombinedModels);
   const selectedKey = useAppSelector(selectSelectedModelKey);
   const { responseStatus } = useAppSelector((state) => state.chat);
@@ -264,176 +271,185 @@ const ChatSender: FC = () => {
         }}
       />
 
-      <ToolAvailabilityNotice
-        notice={explainChatTools({
-          toolsEnabled,
-          enabledServerCount: mcpServers.filter((server) => server.enabled).length,
-          connectedToolCount: mcpRuntime.reduce(
-            (count, server) =>
-              server.status === 'connected' ? count + server.tools.length : count,
-            0
-          ),
-          capability: modelToolCapability({
-            hasTools: modelHasTools(allModels, selectedKey),
-            mark: modelToolsMark(
-              allModels,
-              selectedKey,
-              modelsStatus === 'idle' ? 'loading' : modelsStatus
+      {backendReady && selectedKey ? (
+        <ToolAvailabilityNotice
+          notice={explainChatTools({
+            toolsEnabled,
+            enabledServerCount: mcpServers.filter((server) => server.enabled).length,
+            connectedToolCount: mcpRuntime.reduce(
+              (count, server) =>
+                server.status === 'connected' ? count + server.tools.length : count,
+              0
             ),
-          }),
-        })}
-      />
-      <ToolApprovalCard />
-      {showAttach || canCapturePage ? (
-        // 输入框上方的功能区，后续的输入辅助功能都放这里。
-        <Flex wrap gap="small" align="center" className={Styles.composerToolbar}>
-          {showAttach ? (
-            <span className={Styles.composerTool}>
-              <Button
-                size="small"
-                variant="text"
-                color="default"
-                aria-label={attachTitle}
-                icon={<PictureOutlined />}
-                disabled={!visionEnabled || imageLimitReached || turnBusy}
-                onClick={() => fileInputRef.current?.click()}
-              />
-            </span>
-          ) : null}
-          {canCapturePage ? (
-            <span className={Styles.composerTool}>
-              <Button
-                size="small"
-                variant="text"
-                color="default"
-                aria-label={t('chat.page.attach')}
-                icon={<FileTextOutlined />}
-                loading={page.status === 'loading'}
-                onClick={() => void loadPageRef(dispatch)}
-              />
-            </span>
-          ) : null}
-        </Flex>
+            capability: modelToolCapability({
+              hasTools: modelHasTools(allModels, selectedKey),
+              mark: modelToolsMark(
+                allModels,
+                selectedKey,
+                modelsStatus === 'idle' ? 'loading' : modelsStatus
+              ),
+            }),
+          })}
+        />
       ) : null}
-      <Suggestion
-        items={quickOptions}
-        onSelect={(commandId) => {
-          // 选中一条快捷指令：正文放进输入框，可以改完再发。
-          const command = findQuickCommand(quickCategories, commandId);
-          if (command) setUserContent(command.content);
-        }}
-      >
-        {({ onTrigger, onKeyDown, open }) => {
-          return (
-            <Sender
-              className={Styles.composer}
-              loading={stopVisible}
-              submitType="enter"
-              value={userContent}
-              suffix={false}
-              footer={(_, info) => {
-                const { SendButton, LoadingButton } = info.components;
-                const action = stopVisible ? (
-                  <LoadingButton
-                    type="default"
-                    onMouseDown={(event) => event.stopPropagation()}
-                    onClick={() => abortControl()}
+      <ToolApprovalCard />
+      {hasModelSetupIssue(readiness) ? (
+        <ModelStatusCard readiness={readiness} variant="inline" />
+      ) : null}
+      {hasNoSelectableModels(readiness) ? null : (
+        <>
+          {showAttach || canCapturePage ? (
+            // 输入框上方的功能区，后续的输入辅助功能都放这里。
+            <Flex wrap gap="small" align="center" className={Styles.composerToolbar}>
+              {showAttach ? (
+                <span className={Styles.composerTool}>
+                  <Button
+                    size="small"
+                    variant="text"
+                    color="default"
+                    aria-label={attachTitle}
+                    icon={<PictureOutlined />}
+                    disabled={!visionEnabled || imageLimitReached || turnBusy}
+                    onClick={() => fileInputRef.current?.click()}
                   />
-                ) : (
-                  <SendButton
-                    color="primary"
-                    variant="solid"
-                    icon={<ArrowUpOutlined />}
-                    shape="default"
-                    type="default"
-                    disabled={
-                      !composerCanSend(
-                        responseStatus,
-                        agentIsStreaming(),
-                        userContent.length > 0,
-                        backendReady
-                      )
+                </span>
+              ) : null}
+              {canCapturePage ? (
+                <span className={Styles.composerTool}>
+                  <Button
+                    size="small"
+                    variant="text"
+                    color="default"
+                    aria-label={t('chat.page.attach')}
+                    icon={<FileTextOutlined />}
+                    loading={page.status === 'loading'}
+                    onClick={() => void loadPageRef(dispatch)}
+                  />
+                </span>
+              ) : null}
+            </Flex>
+          ) : null}
+          <Suggestion
+            items={quickOptions}
+            onSelect={(commandId) => {
+              // 选中一条快捷指令：正文放进输入框，可以改完再发。
+              const command = findQuickCommand(quickCategories, commandId);
+              if (command) setUserContent(command.content);
+            }}
+          >
+            {({ onTrigger, onKeyDown, open }) => {
+              return (
+                <Sender
+                  className={Styles.composer}
+                  loading={stopVisible}
+                  submitType="enter"
+                  value={userContent}
+                  suffix={false}
+                  footer={(_, info) => {
+                    const { SendButton, LoadingButton } = info.components;
+                    const action = stopVisible ? (
+                      <LoadingButton
+                        type="default"
+                        onMouseDown={(event) => event.stopPropagation()}
+                        onClick={() => abortControl()}
+                      />
+                    ) : (
+                      <SendButton
+                        color="primary"
+                        variant="solid"
+                        icon={<ArrowUpOutlined />}
+                        shape="default"
+                        type="default"
+                        disabled={
+                          !composerCanSend(
+                            responseStatus,
+                            agentIsStreaming(),
+                            userContent.length > 0,
+                            backendReady
+                          )
+                        }
+                      />
+                    );
+                    return (
+                      <Flex
+                        align="center"
+                        justify="space-between"
+                        gap={8}
+                        className={Styles.composerFooter}
+                      >
+                        <div className={Styles.composerFooterSide}>
+                          <ModelPicker />
+                        </div>
+                        <div className={Styles.composerSend}>{action}</div>
+                      </Flex>
+                    );
+                  }}
+                  onPaste={(event) => {
+                    if (!visionEnabled || turnBusy) return;
+                    const files = Array.from(event.clipboardData?.files ?? []).filter((file) =>
+                      file.type.startsWith('image/')
+                    );
+                    if (!files.length) return;
+                    const text = event.clipboardData?.getData('text') ?? '';
+                    if (!text) event.preventDefault();
+                    void addImageFiles(files);
+                  }}
+                  onChange={(nextVal) => {
+                    if (nextVal === '/' && quickOptions.length) {
+                      onTrigger();
+                    } else if (!nextVal) {
+                      onTrigger(false);
                     }
-                  />
-                );
-                return (
-                  <Flex
-                    align="center"
-                    justify="space-between"
-                    gap={8}
-                    className={Styles.composerFooter}
-                  >
-                    <div className={Styles.composerFooterSide}>
-                      <ModelPicker />
-                    </div>
-                    <div className={Styles.composerSend}>{action}</div>
-                  </Flex>
-                );
-              }}
-              onPaste={(event) => {
-                if (!visionEnabled || turnBusy) return;
-                const files = Array.from(event.clipboardData?.files ?? []).filter((file) =>
-                  file.type.startsWith('image/')
-                );
-                if (!files.length) return;
-                const text = event.clipboardData?.getData('text') ?? '';
-                if (!text) event.preventDefault();
-                void addImageFiles(files);
-              }}
-              onChange={(nextVal) => {
-                if (nextVal === '/' && quickOptions.length) {
-                  onTrigger();
-                } else if (!nextVal) {
-                  onTrigger(false);
-                }
 
-                setUserContent(nextVal);
-              }}
-              onKeyDown={(event) => {
-                // 快捷指令的 Cascader 会在冒泡阶段吃掉空格和回车。
-                if (composerKeyStopsCascader(event.key)) event.stopPropagation();
-                if (event.nativeEvent.isComposing) return;
+                    setUserContent(nextVal);
+                  }}
+                  onKeyDown={(event) => {
+                    // 快捷指令的 Cascader 会在冒泡阶段吃掉空格和回车。
+                    if (composerKeyStopsCascader(event.key)) event.stopPropagation();
+                    if (event.nativeEvent.isComposing) return;
 
-                const action = composerEnterAction({
-                  key: event.key,
-                  shiftKey: event.shiftKey,
-                  metaKey: event.metaKey,
-                  ctrlKey: event.ctrlKey,
-                  composing: false,
-                });
-                if (action === 'break-line') return;
-                if (action === 'insert-line') {
-                  const el = event.target;
-                  if (el instanceof HTMLTextAreaElement) {
-                    const start = el.selectionStart ?? el.value.length;
-                    const end = el.selectionEnd ?? el.value.length;
-                    composerInputRef.current = el;
-                    caretRef.current = start + 1;
-                    event.preventDefault();
-                    setUserContent(`${el.value.slice(0, start)}\n${el.value.slice(end)}`);
-                  }
-                  return;
-                }
+                    const action = composerEnterAction({
+                      key: event.key,
+                      shiftKey: event.shiftKey,
+                      metaKey: event.metaKey,
+                      ctrlKey: event.ctrlKey,
+                      composing: false,
+                    });
+                    if (action === 'break-line') return;
+                    if (action === 'insert-line') {
+                      const el = event.target;
+                      if (el instanceof HTMLTextAreaElement) {
+                        const start = el.selectionStart ?? el.value.length;
+                        const end = el.selectionEnd ?? el.value.length;
+                        composerInputRef.current = el;
+                        caretRef.current = start + 1;
+                        event.preventDefault();
+                        setUserContent(`${el.value.slice(0, start)}\n${el.value.slice(end)}`);
+                      }
+                      return;
+                    }
 
-                const result = onKeyDown(event);
-                // X 2 去掉了建议列表里回车直接选中的回调，只返回 false 来拦住发送。
-                // 回车时点当前高亮项，仍走 Suggestion 自己的 onSelect。
-                if (open && event.key === 'Enter') {
-                  // 分类和指令是两级菜单，每一级都有高亮项，取最后一级的那个。
-                  const actives = document.querySelectorAll<HTMLElement>(
-                    '.ant-cascader-dropdown.ant-suggestion .ant-cascader-menu-item-active'
-                  );
-                  actives[actives.length - 1]?.click();
-                  return false;
-                }
-                return result;
-              }}
-              onSubmit={() => handleSubmit()}
-              onCancel={() => abortControl()}
-            />
-          );
-        }}
-      </Suggestion>
+                    const result = onKeyDown(event);
+                    // X 2 去掉了建议列表里回车直接选中的回调，只返回 false 来拦住发送。
+                    // 回车时点当前高亮项，仍走 Suggestion 自己的 onSelect。
+                    if (open && event.key === 'Enter') {
+                      // 分类和指令是两级菜单，每一级都有高亮项，取最后一级的那个。
+                      const actives = document.querySelectorAll<HTMLElement>(
+                        '.ant-cascader-dropdown.ant-suggestion .ant-cascader-menu-item-active'
+                      );
+                      actives[actives.length - 1]?.click();
+                      return false;
+                    }
+                    return result;
+                  }}
+                  onSubmit={() => handleSubmit()}
+                  onCancel={() => abortControl()}
+                />
+              );
+            }}
+          </Suggestion>
+        </>
+      )}
     </Flex>
   );
 };

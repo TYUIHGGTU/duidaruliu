@@ -1,13 +1,11 @@
 import React, { useSyncExternalStore } from 'react';
 import { App as AntdApp, Button, Space, Badge, Tooltip } from 'antd';
-import { MenuOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
+import { MenuOutlined, PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 
 import { agentIsStreaming, getAgentActivity, resetAgentTranscript, subscribeAgentActivity } from '../../../agent/runtime';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
-import { bumpModelsNonce, checkOllamaStatus } from '../../../store/ollamaSlice';
 import { setMessages } from '../../../store/chatSlice';
-import { findActiveCustomModel } from '../../../models/selection';
 import {
   initializeConversations,
   setIsShowHistoryPanel,
@@ -25,9 +23,6 @@ const HeaderSection: React.FC = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
 
-  const { ollamaUrl, ollamaIsRunning, modelsStatus, serviceError } = useAppSelector(
-    (state) => state.ollama
-  );
   useSyncExternalStore(subscribeAgentActivity, getAgentActivity, getAgentActivity);
   const messages = useAppSelector((state) => state.chat.messages);
   const { isViewHistoryMode, isShowHistoryPanel } = useAppSelector((state) => state.history);
@@ -35,13 +30,6 @@ const HeaderSection: React.FC = () => {
   const mcpToolsEnabled = useAppSelector((state) => state.mcp.toolsEnabled);
   const mcpServers = useAppSelector((state) => state.mcp.servers);
   const mcpRuntime = useSyncExternalStore(subscribeMcpRuntime, getMcpRuntime, getMcpRuntime);
-
-  const activeCustom = useAppSelector(findActiveCustomModel);
-
-  const retryService = () => {
-    dispatch(checkOllamaStatus(ollamaUrl));
-    dispatch(bumpModelsNonce());
-  };
 
   const createNewChat = async () => {
     if (agentIsStreaming() || responseStatus !== 'end') {
@@ -73,14 +61,6 @@ const HeaderSection: React.FC = () => {
         mcpRuntime.find((item) => item.name === server.name)?.status !== 'connected'
     );
 
-  // 选中自定义模型时，本机 Ollama 的状态与当前对话无关，不打扰。
-  const serviceProblem = !activeCustom && (!ollamaIsRunning || modelsStatus === 'error');
-  const serviceText = !ollamaIsRunning
-    ? serviceError
-      ? t('chat.serviceUnreachableDetail', { url: ollamaUrl, detail: serviceError })
-      : t('chat.serviceUnreachable', { url: ollamaUrl })
-    : t('chat.modelsLoadFailed', { url: ollamaUrl });
-
   return (
     <header className={Styles.header}>
       <div className={Styles.left}>
@@ -110,14 +90,6 @@ const HeaderSection: React.FC = () => {
           onClick={() => createNewChat()}
         />
       </Space>
-      {serviceProblem ? (
-        <div className={Styles.serviceRow} role="status">
-          <span>{serviceText}</span>
-          <Button size="small" icon={<ReloadOutlined />} onClick={retryService}>
-            {t('chat.serviceRetry')}
-          </Button>
-        </div>
-      ) : null}
     </header>
   );
 };

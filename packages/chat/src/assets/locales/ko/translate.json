@@ -76,6 +76,22 @@
       "context": "컨텍스트 창",
       "contextUnset": "설정 안 됨",
       "contextHint": "참조한 페이지가 너무 긴지 판단하는 클라이언트 측 컨텍스트 예산입니다. 모델 API로 전송되지 않습니다"
+    },
+    "setup": {
+      "unreachableTitle": "로컬 Ollama에 연결할 수 없습니다",
+      "unreachableDesc": "Ollama를 시작한 뒤 다시 시도하거나, 사용자 지정 모델을 추가해 대화를 시작하세요.",
+      "unreachableWithCustom": "{{url}}에 연결할 수 없습니다. 다시 시도하거나 아래에서 사용자 지정 모델로 전환하세요.",
+      "modelsFailedTitle": "Ollama 모델 목록을 불러올 수 없습니다",
+      "modelsFailedDesc": "{{url}}에서 모델 목록을 읽지 못했습니다. 서비스 상태를 확인하고 다시 시도하거나 사용자 지정 모델을 추가하세요.",
+      "modelsFailedWithCustom": "{{url}}에서 모델 목록을 읽지 못했습니다. 다시 시도하거나 아래에서 사용자 지정 모델로 전환하세요.",
+      "noModelsTitle": "사용 가능한 모델이 없습니다",
+      "noModelsDesc": "{{url}}에 연결되었지만 로컬 대화 모델이 없습니다. Ollama 모델을 받은 뒤 새로고침하거나 사용자 지정 모델을 추가하세요.",
+      "noModelsWithCustom": "로컬 Ollama 모델이 없습니다. 새로고침하거나 아래에서 사용자 지정 모델로 전환하세요.",
+      "noModelSelectedTitle": "모델을 선택하세요",
+      "noModelSelectedDesc": "아래에서 사용할 모델을 선택하면 대화를 시작할 수 있습니다.",
+      "configureModel": "사용자 지정 모델 설정",
+      "ollamaSettings": "Ollama 설정",
+      "refreshModels": "새로고침"
     }
   },
   "links": {

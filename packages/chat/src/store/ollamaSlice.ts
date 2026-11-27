@@ -7,6 +7,10 @@ import type { CapabilityState, OllamaListedModel } from '../utils/modelCapabilit
 export type OllamaSetting = {
   ollamaUrl: string;
   ollamaIsRunning: boolean;
+  /** 最近一次连通检查的状态。 */
+  serviceStatus: 'idle' | 'checking' | 'ready' | 'error';
+  /** 是否已完成过至少一次连通检查，避免首次启动时闪现未连接提示。 */
+  serviceChecked: boolean;
   /** 最近一次连通检查的失败原因。成功时为空。 */
   serviceError: string;
   ollamaModelParams: OllamaModelParams;
@@ -20,6 +24,8 @@ export type OllamaSetting = {
 const initialState: OllamaSetting = {
   ollamaUrl: '',
   ollamaIsRunning: false,
+  serviceStatus: 'idle',
+  serviceChecked: false,
   serviceError: '',
   ollamaModelParams: { model: '' },
   listedModels: [],
@@ -106,9 +112,19 @@ const ollamaSlice = createSlice({
       .addCase(initializeOllama.fulfilled, (state, action) => {
         Object.assign(state, action.payload);
       })
+      .addCase(checkOllamaStatus.pending, (state) => {
+        state.serviceStatus = 'checking';
+      })
       .addCase(checkOllamaStatus.fulfilled, (state, action) => {
         state.ollamaIsRunning = action.payload.ok;
         state.serviceError = action.payload.detail;
+        state.serviceStatus = action.payload.ok ? 'ready' : 'error';
+        state.serviceChecked = true;
+      })
+      .addCase(checkOllamaStatus.rejected, (state) => {
+        state.ollamaIsRunning = false;
+        state.serviceStatus = 'error';
+        state.serviceChecked = true;
       });
   },
 });

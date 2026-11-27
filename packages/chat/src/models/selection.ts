@@ -63,7 +63,11 @@ export function selectActiveContextWindow(state: RootState): number | undefined 
   return resolveContextWindow(custom.contextWindows, state.customModel.contextChoice[custom.id]);
 }
 
-/** 自定义模型直连云端，不依赖本机 Ollama 是否在线。 */
+/** 自定义模型直连云端，不依赖本机 Ollama 是否在线；使用 Ollama 时还需有可用模型。 */
 export function selectBackendReady(state: RootState): boolean {
-  return Boolean(findActiveCustomModel(state)) || state.ollama.ollamaIsRunning;
+  if (findActiveCustomModel(state)) return true;
+  const { ollamaIsRunning, modelsStatus, listedModels, ollamaModelParams } = state.ollama;
+  if (!ollamaIsRunning || modelsStatus === 'error') return false;
+  if (modelsStatus === 'ready' && listedModels.length === 0) return false;
+  return Boolean(ollamaModelParams.model);
 }

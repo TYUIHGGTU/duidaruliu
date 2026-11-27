@@ -1,9 +1,14 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Layout, Menu } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 
 import { useChatLayout, useMinWidth } from '../../shell/layout';
+import {
+  SHELL_MODE_EVENT,
+  settingTabFromLocation,
+  type SetAppMode,
+} from '../../shell/types';
 import OllamaSetting from './components/ollama';
 import CustomModelSetting from './components/customModel';
 import McpSetting from './components/mcp';
@@ -12,7 +17,7 @@ import QuickCommandSetting from './components/quickCommand';
 
 import Styles from './index.module.less';
 import type { MenuProps } from 'antd';
-import type { SetAppMode } from '../../shell/types';
+import type { SettingTab } from '../../host';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -20,10 +25,25 @@ const { Sider, Content } = Layout;
 
 const OptionsPage: React.FC<{ setAppMode: SetAppMode }> = ({ setAppMode }) => {
   const { t } = useTranslation();
-  const [currentPage, setCurrentPage] = useState('ollamaSetting');
+  const [currentPage, setCurrentPage] = useState<SettingTab>(
+    () => settingTabFromLocation() ?? 'ollamaSetting'
+  );
   const layout = useChatLayout();
   const wide = useMinWidth(800);
   const sideNav = layout === 'desktop' && wide;
+
+  useEffect(() => {
+    const syncTab = () => {
+      const next = settingTabFromLocation();
+      if (next) setCurrentPage(next);
+    };
+    window.addEventListener(SHELL_MODE_EVENT, syncTab);
+    window.addEventListener('popstate', syncTab);
+    return () => {
+      window.removeEventListener(SHELL_MODE_EVENT, syncTab);
+      window.removeEventListener('popstate', syncTab);
+    };
+  }, []);
 
   function getItem(label: React.ReactNode, key: React.Key): MenuItem {
     return {
@@ -46,7 +66,7 @@ const OptionsPage: React.FC<{ setAppMode: SetAppMode }> = ({ setAppMode }) => {
       mode={sideNav ? 'inline' : 'horizontal'}
       items={items}
       onClick={(selected) => {
-        setCurrentPage(selected.key as string);
+        setCurrentPage(selected.key as SettingTab);
       }}
     />
   );

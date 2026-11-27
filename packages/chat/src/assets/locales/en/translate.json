@@ -96,6 +96,22 @@
       "context": "Context window",
       "contextUnset": "Not set",
       "contextHint": "Client-side context budget used to check whether a referenced page is too long. It is not sent to the model API"
+    },
+    "setup": {
+      "unreachableTitle": "Cannot reach local Ollama",
+      "unreachableDesc": "Start Ollama and retry, or add a custom model to start chatting.",
+      "unreachableWithCustom": "Cannot reach {{url}}. Retry or switch to a custom model below.",
+      "modelsFailedTitle": "Could not load Ollama models",
+      "modelsFailedDesc": "Could not load models from {{url}}. Check the service and retry, or add a custom model.",
+      "modelsFailedWithCustom": "Could not load models from {{url}}. Retry or switch to a custom model below.",
+      "noModelsTitle": "No models available",
+      "noModelsDesc": "Connected to {{url}}, but no local chat models were found. Pull an Ollama model and refresh, or add a custom model.",
+      "noModelsWithCustom": "No local Ollama models found. Refresh or switch to a custom model below.",
+      "noModelSelectedTitle": "Select a model",
+      "noModelSelectedDesc": "Choose a model below to start chatting.",
+      "configureModel": "Add custom model",
+      "ollamaSettings": "Ollama settings",
+      "refreshModels": "Refresh"
     }
   },
   "links": {

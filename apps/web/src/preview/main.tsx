@@ -21,9 +21,11 @@ const localHost =
 installChatHost({
   storage: createIndexedDbStorage(),
   layout: 'desktop',
-  openSettings() {
+  openSettings(tab) {
     const url = new URL(window.location.href);
     url.searchParams.set('appMode', 'setting');
+    if (tab) url.searchParams.set('tab', tab);
+    else url.searchParams.delete('tab');
     window.history.pushState({}, '', url);
     window.dispatchEvent(new Event(SHELL_MODE_EVENT));
   },

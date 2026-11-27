@@ -1,4 +1,5 @@
 import type { Message, MessageUsage, RoleType, ToolCallRecord } from '../store/chatSlice';
+import type { PageRef } from '../page/types';
 
 export const MAX_CHAT_IMAGES = 4;
 
@@ -44,6 +45,23 @@ export function isChatImage(value: unknown): value is { dataUrl: string } {
   return payload.length > 0 && /^[a-z0-9+/=]+$/i.test(payload);
 }
 
+/** 历史里的页面引用可能来自本地存储或用户导入的 JSON，逐字段校验后再还原。 */
+function normalizePageRef(raw: unknown): PageRef | undefined {
+  if (!raw || typeof raw !== 'object') return undefined;
+  const value = raw as Record<string, unknown>;
+  if (typeof value.url !== 'string' || !value.url) return undefined;
+  if (typeof value.title !== 'string' || !value.title) return undefined;
+  const page: PageRef = {
+    url: value.url,
+    title: value.title,
+    description: typeof value.description === 'string' ? value.description : '',
+    content: typeof value.content === 'string' ? value.content : '',
+    truncated: value.truncated === true,
+  };
+  if (typeof value.siteName === 'string' && value.siteName) page.siteName = value.siteName;
+  return page;
+}
+
 export function normalizeStoredMessage(raw: unknown): Message | null {
   if (!raw || typeof raw !== 'object') return null;
   const value = raw as Record<string, unknown>;
@@ -67,6 +85,8 @@ export function normalizeStoredMessage(raw: unknown): Message | null {
       message.images = images.map((image) => ({ dataUrl: image.dataUrl }));
     }
   }
+  const page = normalizePageRef(value.page);
+  if (page) message.page = page;
   if (typeof value.thinking === 'string' && value.thinking) message.thinking = value.thinking;
   const toolCalls = normalizeToolCalls(value.toolCalls);
   if (toolCalls) message.toolCalls = toolCalls;

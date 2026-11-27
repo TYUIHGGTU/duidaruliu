@@ -124,8 +124,12 @@ const ThemedApp: React.FC<ChatRootProps> = ({ ownsRuntime, onRuntimeStop }) => {
       const next = typeof value === 'function' ? value(current) : value;
       if ((next === 'chat' || next === 'setting') && typeof window !== 'undefined') {
         const url = new URL(window.location.href);
-        if (next === 'chat') url.searchParams.delete('appMode');
-        else url.searchParams.set('appMode', 'setting');
+        if (next === 'chat') {
+          url.searchParams.delete('appMode');
+          url.searchParams.delete('tab');
+        } else {
+          url.searchParams.set('appMode', 'setting');
+        }
         const nextSearch = `${url.pathname}${url.search}`;
         const currentSearch = `${window.location.pathname}${window.location.search}`;
         if (nextSearch !== currentSearch) window.history.pushState({}, '', url);

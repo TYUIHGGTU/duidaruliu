@@ -13,6 +13,7 @@ import {
 import type { AssistantMessage, Message } from '@earendil-works/pi-ai';
 import type { CustomModel, CustomProtocol } from '../src/models/customModel';
 import type { MessageUsage } from '../src/store/chatSlice';
+import type { PageRef } from '../src/page/types';
 
 let failed = 0;
 
@@ -211,6 +212,36 @@ function storage() {
       ?.usage?.cached,
     5,
     'cached never exceeds input'
+  );
+
+  const page: PageRef = {
+    url: 'https://example.com/rust-enum.html',
+    title: 'Rust 的枚举',
+    description: '一篇讲 enum 的文章',
+    content: '# Rust 的枚举\n\n正文',
+    truncated: true,
+    siteName: 'example',
+  };
+  equal(
+    normalizeStoredMessage({ role: 'user', content: '请提取这篇文章的要点', createdAt: 1, page })
+      ?.page,
+    page,
+    'page ref survives a history round trip'
+  );
+  equal(
+    normalizeStoredMessage({ role: 'user', content: 'x', page: { url: 'not-a-ref' } })?.page,
+    undefined,
+    'broken page ref is dropped'
+  );
+  const restoredPage = normalizeStoredMessage({
+    role: 'user',
+    content: 'x',
+    page: { ...page, description: 1, truncated: 'yes' },
+  })?.page;
+  equal(
+    restoredPage,
+    { ...page, description: '', truncated: false },
+    'page ref tolerates wrong field types'
   );
 
   const blocks = groupChatBlocks([

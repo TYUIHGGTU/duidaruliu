@@ -48,15 +48,153 @@
 }
 
 
-.serviceRow {
-  flex: 1 0 100%;
+// 连接异常或尚未配置模型时的统一引导（空会话居中卡片 / 有消息时的底部紧凑卡片 / 有自定义模型可切时的单行提示）
+.setupEmpty {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ant-padding-lg) var(--ant-padding-md);
+}
+
+.setupCard {
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.setupIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin-bottom: var(--ant-margin-sm);
+}
+
+.setupIconError {
+  color: var(--ant-color-error);
+  background: var(--ant-color-error-bg);
+}
+
+.setupIconMuted {
+  color: var(--ant-color-text-secondary);
+  background: var(--ant-color-fill-tertiary);
+}
+
+.setupTitle {
+  font-size: var(--ant-font-size-lg);
+  font-weight: 600;
+  color: var(--ant-color-text);
+  line-height: 1.4;
+}
+
+.setupDetail {
+  margin-top: var(--ant-margin-xs);
+  padding: 2px var(--ant-padding-xs);
+  max-width: 100%;
+  border-radius: var(--ant-border-radius-sm);
+  background: var(--ant-color-fill-quaternary);
+  color: var(--ant-color-text-secondary);
+  font-size: var(--ant-font-size-sm);
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.setupDesc {
+  margin: var(--ant-margin-xs) 0 0;
+  color: var(--ant-color-text-secondary);
+  font-size: var(--ant-font-size-sm);
+  line-height: 1.6;
+}
+
+.setupActions {
+  margin-top: var(--ant-margin-md);
+}
+
+.setupLink {
+  margin-top: var(--ant-margin-xs);
+  color: var(--ant-color-text-secondary);
+}
+
+.setupInlineCard {
+  padding: var(--ant-padding-sm);
+  border: 1px solid var(--ant-color-border-secondary);
+  border-radius: var(--ant-border-radius-lg);
+  background: var(--ant-color-bg-container);
+}
+
+.setupInlineHead {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ant-margin-xs);
+}
+
+.setupInlineIcon {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  margin-top: 2px;
+}
+
+.setupInlineBody {
+  min-width: 0;
+  flex: 1;
+}
+
+.setupInlineTitle {
+  font-weight: 600;
+  color: var(--ant-color-text);
+  line-height: 1.4;
+}
+
+.setupInlineDetail {
+  margin-top: 2px;
+  color: var(--ant-color-text-tertiary);
+  font-size: var(--ant-font-size-sm);
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.setupInlineDesc {
+  margin-top: 4px;
+  color: var(--ant-color-text-secondary);
+  font-size: var(--ant-font-size-sm);
+  line-height: 1.5;
+}
+
+.setupInlineActions {
+  margin-top: var(--ant-margin-sm);
+}
+
+.setupStrip {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--ant-padding-sm);
-  color: var(--ant-color-error);
+  gap: var(--ant-padding-xs);
+  padding: 6px var(--ant-padding-sm);
+  border: 1px solid var(--ant-color-border-secondary);
+  border-radius: var(--ant-border-radius);
+  background: var(--ant-color-bg-container);
+  color: var(--ant-color-text-secondary);
   font-size: var(--ant-font-size-sm);
-  line-height: 1.5;
+  line-height: 1.4;
+}
+
+.setupStripText {
+  min-width: 0;
+  flex: 1;
+  word-break: break-word;
 }
 
 .content {

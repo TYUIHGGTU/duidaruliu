@@ -76,6 +76,22 @@
       "context": "Ventana de contexto",
       "contextUnset": "Sin definir",
       "contextHint": "Presupuesto de contexto del cliente para comprobar si una página citada es demasiado larga. No se envía a la API del modelo"
+    },
+    "setup": {
+      "unreachableTitle": "No se puede conectar con Ollama local",
+      "unreachableDesc": "Inicia Ollama y reintenta, o añade un modelo personalizado para empezar a chatear.",
+      "unreachableWithCustom": "No se puede conectar con {{url}}. Reintenta o elige un modelo personalizado abajo.",
+      "modelsFailedTitle": "No se pudieron cargar los modelos de Ollama",
+      "modelsFailedDesc": "No se pudo leer la lista de modelos de {{url}}. Comprueba el servicio y reintenta, o añade un modelo personalizado.",
+      "modelsFailedWithCustom": "No se pudieron cargar los modelos de {{url}}. Reintenta o elige un modelo personalizado abajo.",
+      "noModelsTitle": "No hay modelos disponibles",
+      "noModelsDesc": "Conectado a {{url}}, pero no hay modelos de chat locales. Descarga un modelo de Ollama y actualiza, o añade un modelo personalizado.",
+      "noModelsWithCustom": "No hay modelos locales de Ollama. Actualiza o elige un modelo personalizado abajo.",
+      "noModelSelectedTitle": "Selecciona un modelo",
+      "noModelSelectedDesc": "Elige un modelo abajo para empezar a chatear.",
+      "configureModel": "Añadir modelo personalizado",
+      "ollamaSettings": "Configuración de Ollama",
+      "refreshModels": "Actualizar"
     }
   },
   "links": {

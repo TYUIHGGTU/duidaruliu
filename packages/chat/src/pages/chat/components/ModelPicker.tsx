@@ -1,12 +1,10 @@
-import React, { useEffect, useState, useSyncExternalStore } from 'react';
+import React, { useState, useSyncExternalStore } from 'react';
 import { Button, Dropdown, Segmented, Tooltip } from 'antd';
 import { CheckOutlined, DownOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 
 import { storageSet } from '../../../host';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useStore';
-import { useOllamaTags } from '../../../hooks/useOllama';
-import { setOllamaModelParams } from '../../../store/ollamaSlice';
 import {
   setActiveCustomModel,
   setCustomModelContext,
@@ -21,6 +19,7 @@ import {
 import {
   findActiveCustomModel,
   selectActiveContextWindow,
+  selectBackendReady,
   selectCombinedModels,
   selectCustomModels,
   selectSelectedModelKey,
@@ -209,35 +208,22 @@ const ModelPickerPanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
  */
 const ModelPicker: React.FC = () => {
   const { t } = useTranslation();
-  const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
 
-  const { ollamaModelParams, ollamaUrl, ollamaIsRunning } = useAppSelector((state) => state.ollama);
-  // 这个 hook 负责拉取 Ollama 模型列表，只能调用一处。弹层里直接读 store。
-  const { ollamaTags } = useOllamaTags(ollamaUrl);
+  const ollamaModels = useAppSelector((state) => state.ollama.listedModels);
   const customModels = useAppSelector(selectCustomModels);
   const activeCustom = useAppSelector(findActiveCustomModel);
   const selectedKey = useAppSelector(selectSelectedModelKey);
   const thinkingEnabled = useAppSelector(selectThinkingEnabled);
-  const backendOnline = Boolean(activeCustom) || ollamaIsRunning;
+  const backendReady = useAppSelector(selectBackendReady);
 
-  // 设置初始化模型
-  useEffect(() => {
-    // 如果模型列表为空或者已有 model，则不处理
-    if (!ollamaTags.length || ollamaModelParams?.model) {
-      return;
-    }
-    dispatch(setOllamaModelParams({ ...ollamaModelParams, model: ollamaTags[0].name }));
-  }, [ollamaTags]);
-
-  const disabled = !backendOnline && customModels.length === 0;
+  const hasOptions = ollamaModels.length > 0 || customModels.length > 0;
+  const disabled = !backendReady && !hasOptions;
   const selectedName = isCustomModelKey(selectedKey)
     ? (customModels.find((model) => model.id === customModelIdFromKey(selectedKey))?.model ??
       selectedKey)
     : selectedKey;
-  const triggerText = disabled
-    ? t('chat.serviceUnreachable', { url: ollamaUrl })
-    : selectedName || t('chat.modelPicker.empty');
+  const triggerText = backendReady && selectedName ? selectedName : t('chat.modelPicker.empty');
   const thinkingOff = Boolean(activeCustom?.thinking) && !thinkingEnabled;
 
   return (
@@ -259,7 +245,7 @@ const ModelPicker: React.FC = () => {
         onMouseDown={(event) => event.stopPropagation()}
       >
         <span
-          className={`${Styles.pickerDot} ${backendOnline ? Styles.pickerDotOnline : ''}`}
+          className={`${Styles.pickerDot} ${backendReady ? Styles.pickerDotOnline : ''}`}
           aria-hidden
         />
         <span className={Styles.pickerTriggerText}>{triggerText}</span>

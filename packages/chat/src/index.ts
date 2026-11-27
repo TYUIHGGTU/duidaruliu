@@ -25,6 +25,7 @@ export type {
   HostCommand,
   PageRequest,
   KeyValueStorage,
+  SettingTab,
   StorageArea,
   StorageChange,
   StorageItems,

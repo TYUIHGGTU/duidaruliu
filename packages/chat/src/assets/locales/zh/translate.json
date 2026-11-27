@@ -96,6 +96,22 @@
       "context": "上下文窗口",
       "contextUnset": "未设置",
       "contextHint": "客户端上下文预算，用于判断引用页面是否超限，不会发给模型接口"
+    },
+    "setup": {
+      "unreachableTitle": "未连接到本地 Ollama",
+      "unreachableDesc": "启动 Ollama 后点击重试，或配置自定义模型开始对话。",
+      "unreachableWithCustom": "连不上 {{url}}，可重试或在下方切换已配置的自定义模型。",
+      "modelsFailedTitle": "无法获取 Ollama 模型列表",
+      "modelsFailedDesc": "没读到 {{url}} 的模型列表。请检查服务状态后重试，或配置自定义模型。",
+      "modelsFailedWithCustom": "没读到 {{url}} 的模型列表，可重试或在下方切换已配置的自定义模型。",
+      "noModelsTitle": "还没有可用模型",
+      "noModelsDesc": "已连接 {{url}}，但本地还没有对话模型。拉取 Ollama 模型后刷新，或配置自定义模型。",
+      "noModelsWithCustom": "本地 Ollama 暂无可用模型，可刷新或在下方切换已配置的自定义模型。",
+      "noModelSelectedTitle": "请选择一个模型",
+      "noModelSelectedDesc": "在下方选择要使用的模型即可开始对话。",
+      "configureModel": "配置自定义模型",
+      "ollamaSettings": "Ollama 设置",
+      "refreshModels": "刷新"
     }
   },
   "links": {

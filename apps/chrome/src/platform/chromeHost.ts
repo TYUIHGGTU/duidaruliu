@@ -5,6 +5,7 @@ import {
   subscribeMcpRuntime,
   store,
   type ChatHost,
+  type SettingTab,
 } from '@ddrl/chat';
 
 import { clearMcpOriginRules, rewriteOrigin, syncMcpOriginRules } from '@/utils/rewriteOrigin';
@@ -15,15 +16,16 @@ import { subscribePageRequest } from './pageRequest';
 
 import { chromeStorage } from './chromeStorage';
 
-export function openChromeSettings() {
+export function openChromeSettings(tab?: SettingTab) {
   void (async () => {
     const currentTabUrl = (await queryCurrentTab()).url || '';
     const isOptionsPage = /^chrome-extension:\/\/ghfkjnjclg.*\/sidepanel\.html.*$/.test(
       currentTabUrl,
     );
     if (isOptionsPage) return;
+    const query = tab ? `appMode=setting&tab=${encodeURIComponent(tab)}` : 'appMode=setting';
     await chrome.tabs.create({
-      url: chrome.runtime.getURL('sidepanel.html?appMode=setting'),
+      url: chrome.runtime.getURL(`sidepanel.html?${query}`),
     });
   })();
 }

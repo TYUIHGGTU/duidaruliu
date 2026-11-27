@@ -76,6 +76,22 @@
       "context": "Fenêtre de contexte",
       "contextUnset": "Non défini",
       "contextHint": "Budget de contexte côté client pour vérifier si une page citée est trop longue. Il n'est pas envoyé à l'API du modèle"
+    },
+    "setup": {
+      "unreachableTitle": "Impossible de joindre Ollama en local",
+      "unreachableDesc": "Démarrez Ollama puis réessayez, ou ajoutez un modèle personnalisé pour commencer à discuter.",
+      "unreachableWithCustom": "Impossible de joindre {{url}}. Réessayez ou choisissez un modèle personnalisé ci-dessous.",
+      "modelsFailedTitle": "Impossible de charger les modèles Ollama",
+      "modelsFailedDesc": "Impossible de lire la liste des modèles sur {{url}}. Vérifiez le service puis réessayez, ou ajoutez un modèle personnalisé.",
+      "modelsFailedWithCustom": "Impossible de charger les modèles sur {{url}}. Réessayez ou choisissez un modèle personnalisé ci-dessous.",
+      "noModelsTitle": "Aucun modèle disponible",
+      "noModelsDesc": "Connecté à {{url}}, mais aucun modèle de discussion local n'a été trouvé. Téléchargez un modèle Ollama puis actualisez, ou ajoutez un modèle personnalisé.",
+      "noModelsWithCustom": "Aucun modèle Ollama local. Actualisez ou choisissez un modèle personnalisé ci-dessous.",
+      "noModelSelectedTitle": "Choisir un modèle",
+      "noModelSelectedDesc": "Sélectionnez un modèle ci-dessous pour commencer à discuter.",
+      "configureModel": "Ajouter un modèle personnalisé",
+      "ollamaSettings": "Paramètres Ollama",
+      "refreshModels": "Actualiser"
     }
   },
   "links": {

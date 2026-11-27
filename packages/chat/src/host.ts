@@ -23,11 +23,18 @@ export type McpRuntimeListener = (runtime: unknown[]) => void;
 
 export type ChatLayout = 'compact' | 'desktop';
 
+export type SettingTab =
+  | 'ollamaSetting'
+  | 'customModel'
+  | 'mcp'
+  | 'quickCommand'
+  | 'customLink';
+
 export type ChatHost = {
   storage: KeyValueStorage;
   /** 不写时按紧凑侧栏排。Web 日常使用传 desktop，Chrome 不要传。 */
   layout?: ChatLayout;
-  openSettings: () => void;
+  openSettings: (tab?: SettingTab) => void;
   /** 扩展右键菜单等宿主命令。Web 预览不接。 */
   subscribeHostCommand?: (listener: (command: HostCommand) => void) => () => void;
   /** 采集页面快照。不传 tabId 时取当前窗口的活动标签页。Web 预览不实现。 */
